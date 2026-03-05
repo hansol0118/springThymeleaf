@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequiredArgsConstructor
 @Validated
+
+
 public class PostController {
 
     private final PostService postService;
