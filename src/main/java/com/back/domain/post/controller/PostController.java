@@ -6,11 +6,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ public class PostController {
     }
 
     @AllArgsConstructor
+    @Getter
     public static class WriteRequestForm {
         @Size(min=2, max=10, message = "3-제목은 2자 이상 10자 이하로 입력해주세요.")
         @NotBlank(message = "1-제목은 필수입니다.")
@@ -38,7 +41,7 @@ public class PostController {
     }
 
     @PostMapping("/posts/write")
-    public String write(@Valid WriteRequestForm form, BindingResult bindingResult,
+    public String write(@Valid @ModelAttribute("form") WriteRequestForm form, BindingResult bindingResult,
                         Model model) {
 
         if(bindingResult.hasErrors()) {
