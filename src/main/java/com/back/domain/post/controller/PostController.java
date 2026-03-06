@@ -22,7 +22,6 @@ public class PostController {
 
     @GetMapping("/posts/write-form")
     public String writeForm() {
-
         return "write";
     }
 
@@ -52,35 +51,14 @@ public class PostController {
                     .sorted()
                     .collect(Collectors.joining("\n"));
 
+            // 템플릿 응답
             return "write";
         }
 
         Post post = postService.write(form.title, form.content);
 
+        // 템플릿 응답
         return "%d번 글이 작성되었습니다.".formatted(post.getId());
     }
-
-//    private String getWriteForm(String errorMessage, String title, String content) {
-//        return """
-//                <ul style="color:red">%s</ul>
-//                <form method="post" action="/posts/write">
-//                  <input type="text" name="title" value="%s" autoFocus>
-//                  <br>
-//                  <textarea name="content">%s</textarea>
-//                  <br>
-//                  <input type="submit" value="작성">
-//                </form>
-//
-//                <script>
-//                    const li = document.querySelector("ul li");
-//                    const errorFieldName = li.dataset.errorField;
-//
-//                    if(errorFieldName.length > 0) {
-//                        const form = document.querySelector("form");
-//                        form[errorFieldName].focus();
-//                    }
-//                </script>
-//                """.formatted(errorMessage, title, content);
-//    }
 
 }
