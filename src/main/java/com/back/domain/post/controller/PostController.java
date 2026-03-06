@@ -9,10 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.stream.Collectors;
 
@@ -23,10 +21,9 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/posts/write-form")
-    @ResponseBody
     public String writeForm() {
 
-        return getWriteForm("", "", "", "");
+        return "write";
     }
 
     @AllArgsConstructor
@@ -41,18 +38,21 @@ public class PostController {
     }
 
     @PostMapping("/posts/write")
-    @ResponseBody
     public String write(@Valid WriteRequestForm form, BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()) {
 
             String errorMessages = bindingResult.getFieldErrors()
                     .stream()
-                    .map(FieldError::getDefaultMessage)
+                    .map((fieldError) -> fieldError.getField() + "-" + fieldError.getDefaultMessage())
+                    .map((message) -> {
+                        String[] bits = message.split("-"); // [field, 1, errorMessage]
+                        return "<!-- %s --> <li data-error-field=\"%s\">%s</li>".formatted(bits[1], bits[0], bits[2]);
+                    })
                     .sorted()
-                    .collect(Collectors.joining("<br>"));
+                    .collect(Collectors.joining("\n"));
 
-            return getWriteForm(errorMessages, form.title, form.content, "title");
+            return "write";
         }
 
         Post post = postService.write(form.title, form.content);
@@ -60,26 +60,27 @@ public class PostController {
         return "%d번 글이 작성되었습니다.".formatted(post.getId());
     }
 
-    private String getWriteForm(String errorMessage, String title, String content, String errorFieldName) {
-        return """
-                <div style="color:red">%s</div>
-                <form method="post" action="/posts/write">
-                  <input type="text" name="title" value="%s" autoFocus>
-                  <br>
-                  <textarea name="content">%s</textarea>
-                  <br>
-                  <input type="submit" value="작성">
-                </form>
-                
-                <script>
-                    const errorFieldName = "%s";
-                
-                    if(errorFieldName.length > 0) {
-                        const form = document.querySelector("form");
-                        form[errorFieldName].focus();
-                    }
-                </script>
-                """.formatted(errorMessage, title, content, errorFieldName);
-    }
+//    private String getWriteForm(String errorMessage, String title, String content) {
+//        return """
+//                <ul style="color:red">%s</ul>
+//                <form method="post" action="/posts/write">
+//                  <input type="text" name="title" value="%s" autoFocus>
+//                  <br>
+//                  <textarea name="content">%s</textarea>
+//                  <br>
+//                  <input type="submit" value="작성">
+//                </form>
+//
+//                <script>
+//                    const li = document.querySelector("ul li");
+//                    const errorFieldName = li.dataset.errorField;
+//
+//                    if(errorFieldName.length > 0) {
+//                        const form = document.querySelector("form");
+//                        form[errorFieldName].focus();
+//                    }
+//                </script>
+//                """.formatted(errorMessage, title, content);
+//    }
 
 }
