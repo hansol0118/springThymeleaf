@@ -50,7 +50,7 @@ public class PostController {
 
         Post post = postService.write(form.title, form.content);
         model.addAttribute("id", post.getId());
-        return "writeDone";
+        return "redirect:/posts/write"; // GET요청
     }
 
 }
