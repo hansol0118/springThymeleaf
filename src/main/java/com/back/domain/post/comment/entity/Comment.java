@@ -13,10 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class Comment extends BaseEntity {
-    private String comment;
+    private String content;
 
     @ManyToOne
     private Post post;
 
-
+    public void update(String content) {
+        this.content = content;
+    }
 }
